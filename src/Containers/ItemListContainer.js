@@ -1,39 +1,36 @@
 import React, { useState, useEffect } from "react";
-import Item from "../Components/Item/Item";
+import { useParams } from "react-router-dom";
+import ItemList from "../Components/ItemList/ItemList";
+import { getFirestore } from "../Firebase/firebase";
 
-const ItemListContainer = ({ min, max }) => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const getProducts = fetch(
-      "https://api.mercadolibre.com/sites/MLA/search?category=MLA1743&limit=20"
-    );
-    getProducts
-      .then((response) => {
-        const data = response.json();
-        return data;
-      })
-      .then((data) => {
-        setProducts(data.results);
-      });
-  }, []);
+const ItemListContainer = () => {
+  const [list, setList] = useState([]);
+  const { categoryId } = useParams();
 
   useEffect(() => {
-    console.log(products, "products");
-  }, [products]);
+    const db = getFirestore();
 
+    let docRef;
+
+    if (categoryId) {
+      docRef = db.collection("items").where("categoryId", "==", categoryId);
+    } else {
+      docRef = db.collection("items");
+    }
+
+    docRef.get().then((querySnapshot) => {
+      if (querySnapshot.size === 0) {
+        console.log("No hay en existencia");
+      }
+      setList(querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    });
+  }, [categoryId]);
   return (
-    <div>
-      <div>
-        {products.length &&
-          products.map((product) => (
-            <Item
-              title={product.title}
-              id={product.id}
-              price={product.price}
-              image={product.image}
-            />
-          ))}
+    <div className="container">
+      <div className="col-12 mr-2">
+        <div className="row">
+          <ItemList list={list} />
+        </div>
       </div>
     </div>
   );

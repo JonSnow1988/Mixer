@@ -1,14 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Context } from "../context/cartContext";
-import ItemDetail from "../Components/ItemDetail/ItemDetail ";
+//import listProducts from '../../listProducts';
 
-function ItemDetailContainer() {
-  const { id } = useParams();
+import ItemDetail from "../Components/ItemDetail/ItemDetail";
+import { getFirestore } from "../Firebase/firebase";
+
+const ItemDetailContainer = () => {
+  const [loading, setLoading] = useState(false);
+
+  const [item, setItem] = useState([]);
+  const { productId } = useParams();
 
   useEffect(() => {
-    console.log("id--->", id);
-  }, [id]);
-  return <ItemDetail />;
-}
+    const db = getFirestore();
+    const docRef = db.collection("items").doc(productId);
+
+    docRef.get().then((querySnapshot) => {
+      setLoading(false);
+      setItem({ id: querySnapshot.id, ...querySnapshot.data() });
+    });
+  }, [productId]);
+
+  return <>{loading ? <div /> : <ItemDetail item={item} />}</>;
+};
 export default ItemDetailContainer;

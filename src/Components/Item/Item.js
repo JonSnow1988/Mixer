@@ -1,32 +1,15 @@
 import React from "react";
-
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Count from "../Count/Count";
 
-const Item = ({ product }) => {
-  return (
-    <div className="contItems">
-      (product && products.lenght ? products.map((product) =>
-      {
-        <Card key={product.id} style={{ width: "18rem", margin: "10px" }}>
-          <Link to={`/item/${product.id}`} className="Links">
-            <Card.Img variant="top" src={product.thumbnail} />
-          </Link>
-          <Card.Body>
-            <Link to={`/item/${product.id}`} className="Links">
-              <Card.Title className="price">{product.price}</Card.Title>
-            </Link>
-            <div className="count">
-              <Count min="0" max="20">
-                Agregar
-              </Count>
-            </div>
-          </Card.Body>
-        </Card>
-      }{" "}
-      : )
-    </div>
-  );
-};
+const Item = ({ item: { id, name, description, img } }) => (
+  <Card className="card" flexDirection="colum">
+    <h2>{name}</h2>
+    <Link to={`/item/${id}`}>
+      <img src={img} alt="img" width="350" />
+    </Link>
+    <p>{description}</p>
+  </Card>
+);
+
 export default Item;

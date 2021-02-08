@@ -1,35 +1,43 @@
-import React from 'react'
-import {Card, Button } from 'react-bootstrap'
-import count from '../../Containers/CountContainer'
-import './itemDetailStyle.css'
+import React from "react";
+import ItemCount from "../Count/Count";
+import Item from "../Item/Item";
+import { Button } from "react-bootstrap";
 
-export default function ItemDetail({item, loading, Count, setCount, handlePurchase}) {
+import CartContext from "../../Context/CartContext";
 
-    return (
-        loading ? 
-            <React.Fragment>            
-            <div className='itemst'>
-                <Card className="text-center" bg='secondary' text='white' style={{minHeight:'90vh'}}>
-                <Card.Header>Detalles del Producto</Card.Header>
-                <Card.Body>
-                    <Card.Title>{item.title}</Card.Title>
-                    <Card.Text> {item.description}</Card.Text>                 
-                   
-                    <div className="countItem">
-                        <Count min={0} max={item.stock} Count={Count} setCount={setCount}>Agregar</Count>
-                    </div>
-                    {
-                        Count > 0 ? 
-                            <Button variant="primary" onClick={handlePurchase}>Comprar {Count}</Button>
-                            :
-                            <Button variant="primary" onClick={()=>setCount(Count+1)}>Agregar!</Button>
-                    }
-                </Card.Body>
-                <Card.Footer className="text-white">{item.stock} en Stock!</Card.Footer>
-                </Card>
-            </div>
-            </React.Fragment>
-            
-        :
-    )
-}
+const ItemDetail = ({ item }) => {
+  const [count, setCount] = React.useState(1);
+  const { productsAdd } = React.useContext(CartContext);
+
+  const handleClickComprar = () => {
+    if (count > 0) {
+      productsAdd({
+        id: item.id,
+        name: item.name,
+        img: item.img,
+        count,
+        price: item.price,
+      });
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="col-4">
+        <div className="row mr-2">
+          <Item item={item} />
+          <div className="box" margin={10}>
+            <ItemCount setCount={setCount} count={count} min={1} max={30} />
+            <Button className="btn btn-success" onClick={handleClickComprar}>
+              Comprar
+            </Button>
+            <p>Precio: $ {Intl.NumberFormat().format(item.price)}</p>
+            <p>Stock disponible: {item.stock}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ItemDetail;
